@@ -1,0 +1,15 @@
+{
+  "name": "9bryan-hadoop",
+  "version": "0.1.0",
+  "author": "9bryan",
+  "summary": "Manage apache hadoop stack",
+  "license": "Apache-2.0",
+  "source": "https://github.com/9bryan/puppet-hadoop",
+  "project_page": "https://github.com/9bryan/puppet-hadoop",
+  "issues_url": "https://github.com/9bryan/puppet-hadoop/issues",
+  "dependencies": [
+    {"name":"puppetlabs-stdlib","version_requirement":">= 1.0.0"}
+    {"name":"nanliu-staging","version_requirement":">= 1.0.3"}
+  ]
+}
+
