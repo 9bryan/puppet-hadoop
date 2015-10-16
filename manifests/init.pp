@@ -42,7 +42,47 @@
 #
 # Copyright 2015 Your name here, unless otherwise noted.
 #
-class hadoop {
+class hadoop (
+  $download_base_url = 'http://apache.arvixe.com/hadoop/common/hadoop-2.7.1',
+  $filename          = 'hadoop-2.7.1.tar.gz',
+  $hadoop_user       = 'hadoop',
 
+){
+
+  #Install/configure java
+  include java
+  file { '/etc/profile.d/java_home.sh':
+    content => ,
+  }
+
+  $hadoop_home = "/home/${hadoop_user}/hadoop"
+
+  #Setup Hadoop user
+  user { $hadoop_user:
+    ensure     => present,
+    managehome => true,
+  }
+
+  file { $hadoop_home:
+    ensure  => directory,
+    mode    => '0775',
+    owner   => $hadoop_user,
+    group   => $hadoop_user,
+    require => User[$hadoop_user],
+  }
+
+  staging::file { $filename:
+    source => "${download_base_url}/${filename}",
+  }
+
+  staging::extract { $filename:
+    source  => "/opt/staging/hadoop/${filename}",
+    target  => "/home/${hadoop_user}/hadoop",
+    user    => $hadoop_user,
+    group   => $hadoop_user,
+    strip   => 1,
+    creates => "${hadoop_home}/bin",
+    require => [File[$hadoop_home],Staging::File[$filename]],
+  }
 
 }
