@@ -35,91 +35,31 @@
 # Authors
 # -------
 #
-# Author Name <bryan.wood@puppetlabs.com>
+# Bryan Wood <bryan.wood@puppetlabs.com>
 #
 # Copyright
 # ---------
 #
-# Copyright 2015 Your name here, unless otherwise noted.
+# Copyright 2015 Bryan Wood, unless otherwise noted.
 #
 class hadoop (
   $download_base_url = 'http://apache.arvixe.com/hadoop/common/hadoop-2.7.1',
   $filename          = 'hadoop-2.7.1.tar.gz',
   $hadoop_user       = 'hadoop',
-
 ){
 
   #Install/configure java
-  include java
+  require java
 
-  $hadoop_home = "/home/${hadoop_user}/hadoop"
+  #$hadoop_home = "/home/${hadoop_user}/hadoop"
   #I would rather get something like this to work but I can't:  $java_home = $java::params::java[$distribution]['java_home']
   $java_home   = '/etc/alternatives/java_sdk'
+  $hadoop_home = "/home/${hadoop_user}/hadoop"
 
-  #Setup Hadoop user
-  user { $hadoop_user:
-    ensure     => present,
-    managehome => true,
-  }
-
-  file_line { 'JAVA_HOME':
-    path  => "/home/${hadoop_user}/.bashrc",
-    line  => "export JAVA_HOME=${java_home}",
-    match => 'JAVA_HOME=',
-  }
-
-  file_line { 'HADOOP_HOME':
-    path  => "/home/${hadoop_user}/.bashrc",
-    line  => "export HADOOP_HOME=${hadoop_home}",
-    match => 'HADOOP_HOME=',
-  }
-
-  file_line { 'HADOOP_INSTALL':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export HADOOP_INSTALL=\$HADOOP_HOME",
-    match   => 'HADOOP_INSTALL=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'HADOOP_MAPRED_HOME':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export HADOOP_MAPRED_HOME=\$HADOOP_HOME",
-    match   => 'HADOOP_MAPRED_HOME=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'HADOOP_COMMON_HOME':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export HADOOP_COMMON_HOME=\$HADOOP_HOME",
-    match   => 'HADOOP_COMMON_HOME=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'HADOOP_HDFS_HOME':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export HADOOP_HDFS_HOME=\$HADOOP_HOME",
-    match   => 'HADOOP_HDFS_HOME=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'YARN_HOME':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export YARN_HOME=\$HADOOP_HOME",
-    match   => 'YARN_HOME=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'HADOOP_COMMON_LIB_NATIVE_DIR':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export HADOOP_COMMON_LIB_NATIVE_DIR=\$HADOOP_HOME/lib/native",
-    match   => 'HADOOP_COMMON_LIB_NATIVE_DIR=',
-    require => File_line['HADOOP_HOME'],
-  }
-
-  file_line { 'HADOOP_USER_PATH':
-    path    => "/home/${hadoop_user}/.bashrc",
-    line    => "export PATH=\$PATH:\$HADOOP_HOME/sbin:\$HADOOP_HOME/bin",
-    require => File_line['HADOOP_HOME'],
+  #Create Hadoop user
+  class { 'hadoop::user':
+    hadoop_user => $hadoop_user,
+    hadoop_home => $hadoop_home,
   }
 
   #Create $hadoop_home
