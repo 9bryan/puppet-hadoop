@@ -2,6 +2,7 @@
 class hadoop::user (
   $hadoop_user = 'hadoop',
   $hadoop_home = "/home/${$hadoop_user}/hadoop",
+  $java_home   = '/etc/alternatives/java_sdk',
 ){
   #Setup Hadoop user
   user { $hadoop_user:

@@ -60,6 +60,7 @@ class hadoop (
   class { 'hadoop::user':
     hadoop_user => $hadoop_user,
     hadoop_home => $hadoop_home,
+    java_home   => $java_home,
   }
 
   #Create $hadoop_home
