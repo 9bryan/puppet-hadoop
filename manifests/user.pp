@@ -12,7 +12,7 @@ class hadoop::user (
 
   file_line { 'JAVA_HOME':
     path  => "/home/${hadoop_user}/.bashrc",
-    line  => "export JAVA_HOME=${::java_home}",
+    line  => "export JAVA_HOME=${java_home}",
     match => 'JAVA_HOME=',
   }
 
