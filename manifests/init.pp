@@ -29,7 +29,7 @@
 #
 # @example
 #    class { 'hadoop':
-#      servers => [ 'pool.ntp.org', 'ntp.local.company.com' ],
+#      $download_url => 'http://mirror.sdunix.com/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz',
 #    }
 #
 # Authors
@@ -43,18 +43,28 @@
 # Copyright 2015 Bryan Wood, unless otherwise noted.
 #
 class hadoop (
-  $download_base_url = 'http://apache.arvixe.com/hadoop/common/hadoop-2.7.1',
-  $filename          = 'hadoop-2.7.1.tar.gz',
-  $hadoop_user       = 'hadoop',
+  $download_url        = 'http://mirror.sdunix.com/apache/hadoop/common/hadoop-2.7.2/hadoop-2.7.2.tar.gz',
+  $hadoop_user         = 'hadoop',
+  $cluster_name        = 'hadoop_cluster',
+  $default_fs          = 'hdfs://localhost:9000',
+  $io_file_buffer_size = '131072',
 ){
+  $filename            = basename($download_url)
 
   #Install/configure java
   require java
 
-  #$hadoop_home = "/home/${hadoop_user}/hadoop"
   #I would rather get something like this to work but I can't:  $java_home = $java::params::java[$distribution]['java_home']
   $java_home   = '/etc/alternatives/java_sdk'
-  $hadoop_home = "/home/${hadoop_user}/hadoop"
+
+  $hadoop_home         = "/home/${hadoop_user}/hadoop"
+
+  #Configure HADOOP_PREFIX
+  file_line { 'HADOOP_PREFIX':
+    path  => '/etc/profile',
+    line  => "export HADOOP_PREFIX=${hadoop_home}",
+    match => 'HADOOP_PREFIX=',
+  }
 
   #Create Hadoop user
   class { 'hadoop::user':
@@ -74,7 +84,7 @@ class hadoop (
 
   #Download Hadoop media
   staging::file { $filename:
-    source => "${download_base_url}/${filename}",
+    source => $download_url,
   }
 
   #Extract Hadoop media to $hadoop_home
@@ -86,6 +96,15 @@ class hadoop (
     strip   => 1,
     creates => "${hadoop_home}/bin",
     require => [File[$hadoop_home],Staging::File[$filename]],
+  }
+
+  #Setup core-site config
+  file { "${hadoop_home}/etc/hadoop/core-site.xml":
+    ensure  => 'file',
+    content => template('hadoop/core-site.xml'),
+    group   => $hadoop_user,
+    owner   => $hadoop_user,
+    mode    => '0644',
   }
 
 }
