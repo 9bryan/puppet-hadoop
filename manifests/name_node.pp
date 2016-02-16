@@ -26,6 +26,7 @@ class hadoop::name_node (
     group   => $hadoop_user,
     owner   => $hadoop_user,
     mode    => '0644',
+    require => Class[hadoop],
   }
 
 }

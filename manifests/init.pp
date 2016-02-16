@@ -105,6 +105,7 @@ class hadoop (
     group   => $hadoop_user,
     owner   => $hadoop_user,
     mode    => '0644',
+    require => [File[$hadoop_home],Staging::Extract[$filename]],
   }
 
 }
